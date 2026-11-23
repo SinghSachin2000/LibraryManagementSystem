@@ -1,0 +1,45 @@
+# Build files
+bin/
+obj/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.cache
+
+# Visual Studio Code settings (optional)
+.vscode/
+
+# Logs
+*.log
+
+# Test results
+TestResults/
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+
+# Publish output
+publish/
+
+# NuGet packages (usually generated/restored)
+packages/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Secrets and environment variables
+.env
+.env.*
+!.env.example
+
+# Local app settings
+appsettings.Development.json
+appsettings.Local.json
+
+# Database files (if local-only)
+*.db
+*.sqlite
+*.sqlite3
