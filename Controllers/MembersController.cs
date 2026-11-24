@@ -2,6 +2,7 @@
 using LibraryManagement.Api.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using LibraryManagement.Api.DTOs;
 
 namespace LibraryManagement.Api.Controllers
 {
@@ -18,14 +19,29 @@ namespace LibraryManagement.Api.Controllers
         [HttpGet]
         public IActionResult GetAllMembers()
         {
-            var members = _context.Members.ToList();
+            //var members = _context.Members.ToList();
+            var members = _context.Members.Select(m=>new MemberDto
+            {
+                Id = m.Id,
+                FullName = m.FullName,
+                Email = m.Email,
+                JoinedOn = m.JoinedOn,
+                IsActive = m.IsActive
+            }).ToList();
             return Ok(members);
         }
 
         [HttpGet("{id:int}")]
         public IActionResult GetMemberById(int id)
         {
-            var member = _context.Members.FirstOrDefault(m => m.Id == id);
+            var member = _context.Members.Where(m=>m.Id==id).Select(m=>new MemberDto
+            {
+                Id = m.Id,
+                FullName = m.FullName,
+                Email = m.Email,
+                JoinedOn = m.JoinedOn,
+                IsActive = m.IsActive
+            }).FirstOrDefault();
             if (member == null)
             {
                 return NotFound(new { message = "member is not found" });
@@ -34,7 +50,7 @@ namespace LibraryManagement.Api.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddMember([FromBody] Member member)
+        public IActionResult AddMember([FromBody] CreateMemberDto member)
         {
             if (string.IsNullOrWhiteSpace(member.FullName))
             {
@@ -49,19 +65,36 @@ namespace LibraryManagement.Api.Controllers
             {
                 return BadRequest(new { message = "A member with this email is already exists" });
             }
-            member.Id = 0;
-            member.JoinedOn = DateTime.Now;
-            member.IsActive = true;
+            //member.Id = 0;
+            //member.JoinedOn = DateTime.Now;
+            //member.IsActive = true;
 
-            _context.Members.Add(member);
+            var newMember =new Member
+            {
+                FullName = member.FullName,
+                Email = member.Email,
+                JoinedOn = DateTime.Now,
+                IsActive = true
+            };
+
+            _context.Members.Add(newMember);
             _context.SaveChanges();
 
-            return CreatedAtAction(nameof(GetMemberById), new { id = member.Id }, member);
+            return CreatedAtAction(nameof(GetMemberById),
+                new { id = newMember.Id },
+                new MemberDto
+                {
+                    Id = newMember.Id,
+                    FullName = newMember.FullName,
+                    Email = newMember.Email,
+                    JoinedOn = newMember.JoinedOn,
+                    IsActive = newMember.IsActive
+                });
 
         }
 
         [HttpPut("{id:int}")]
-        public IActionResult updateMember(int id, [FromBody] Member member)
+        public IActionResult updateMember(int id, [FromBody] UpdateMemberDto member)
         {
             var existingMember = _context.Members.FirstOrDefault(m => m.Id == id);
             if (existingMember==null)
@@ -90,7 +123,14 @@ namespace LibraryManagement.Api.Controllers
 
             _context.SaveChanges();
 
-            return Ok(existingMember);
+            return Ok(new MemberDto
+            {
+                Id = existingMember.Id,
+                FullName = existingMember.FullName,
+                Email = existingMember.Email,
+                JoinedOn = existingMember.JoinedOn,
+                IsActive = existingMember.IsActive
+            });
         }
 
         [HttpDelete("{id:int}")]
