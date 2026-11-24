@@ -1,4 +1,5 @@
 using LibraryManagement.Api.Data;
+using LibraryManagement.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,8 @@ builder.Services.AddDbContext<LibraryDbContext>(
     option => option.UseSqlite(
     builder.Configuration.GetConnectionString("LibraryDb")
     ));
+builder.Services.AddScoped<IBookService, BookService>();//ek HTTP request ke scope mein service ka instance manage hota hai. Agli request par alag scope hota hai.
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
