@@ -11,6 +11,8 @@ namespace LibraryManagement.Api.Services
         bool DeleteBook(int id);
         string? ValidateBook(CreateBookDto dto);
         string? ValidateUpdateBook(int id, UpdateBookDto dto);
+
+        List<BookDto> GetBooks(string? author, bool? available, int page, int pageSize);
     }
 }
 

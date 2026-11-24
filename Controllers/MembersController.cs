@@ -17,10 +17,13 @@ namespace LibraryManagement.Api.Controllers
         //    _context = context;
         //}
         private readonly IMemberService _memberService;
-        public MembersController(IMemberService memberService)
+        private readonly ILoanService _loanService;
+        public MembersController(IMemberService memberService, ILoanService loanService)
         {
             _memberService = memberService;
+            _loanService = loanService;
         }
+
         [HttpGet]
         public IActionResult GetAllMembers()
         {
@@ -178,6 +181,21 @@ namespace LibraryManagement.Api.Controllers
 
 
             return NoContent();
+        }
+
+        [HttpGet("{id}/loans")]
+        public IActionResult GetMemberLoans(int id)
+        {
+            var member = _memberService.GetMemberById(id);
+
+            if (member == null)
+            {
+                return NotFound(new { message = "Member not found" });
+            }
+
+            var loans = _loanService.GetMemberLoans(id);
+
+            return Ok(loans);
         }
     }
 }

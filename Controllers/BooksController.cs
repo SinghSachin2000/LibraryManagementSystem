@@ -49,12 +49,35 @@ namespace LibraryManagement.Api.Controllers
             _bookService = bookService;
         }
         // IActionResult : method HTTP response return karega
+        //[HttpGet]
+        //public IActionResult GetAllBooks()
+        //{
+        //    var books = _bookService.GetAllBooks();
+        //    return Ok(books);
+        //    //return Ok(_books);
+        //}
+
         [HttpGet]
-        public IActionResult GetAllBooks()
-        {
-            var books = _bookService.GetAllBooks();
+        public IActionResult GetAllBooks(
+            string? author,
+            bool? available,
+            int page = 1,
+            int pageSize = 10)
+         {
+            // Pagination validation
+            if (page < 1)
+            {
+                return BadRequest(new { message = "Page must be greater than 0" });
+            }
+
+            if (pageSize < 1 || pageSize > 100)
+            {
+                return BadRequest(new { message = "PageSize must be between 1 and 100" });
+            }
+
+            var books = _bookService.GetBooks(author, available, page, pageSize);
+
             return Ok(books);
-            //return Ok(_books);
         }
 
         [HttpGet("{id:int}")]

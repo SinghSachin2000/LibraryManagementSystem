@@ -1,4 +1,5 @@
 using LibraryManagement.Api.Data;
+using LibraryManagement.Api.Middleware;
 using LibraryManagement.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,12 +12,14 @@ builder.Services.AddDbContext<LibraryDbContext>(
     ));
 builder.Services.AddScoped<IBookService, BookService>();//ek HTTP request ke scope mein service ka instance manage hota hai. Agli request par alag scope hota hai.
 builder.Services.AddScoped<IMemberService, MemberService>();
+builder.Services.AddScoped<ILoanService, LoanService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

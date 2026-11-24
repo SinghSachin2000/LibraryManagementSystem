@@ -159,5 +159,45 @@ namespace LibraryManagement.Api.Services
 
             return true;
         }
+
+        public List<BookDto> GetBooks(string? author, bool? available, int page, int pageSize)
+        {
+            var query = _context.Books.AsQueryable();//database ke books table se query banate hain
+
+            // Author filter
+            if (!string.IsNullOrWhiteSpace(author))
+            {
+                query = query.Where(b => b.Author.ToLower().Contains(author.ToLower()));
+            }
+
+            // Availability filter
+            if (available == true)
+            {
+                query = query.Where(b => b.AvailableCopies > 0);
+            }
+            else if (available == false)
+            {
+                query = query.Where(b => b.AvailableCopies == 0);
+            }
+
+            // Pagination
+            //OrderBy : Books ko ID ke order mein arrange karta hai.
+            //skip and takeRequired page ki books select karta hai.
+            return query
+                .OrderBy(b => b.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(b => new BookDto
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Author = b.Author,
+                    ISBN = b.ISBN,
+                    PublishedYear = b.PublishedYear,
+                    TotalCopies = b.TotalCopies,
+                    AvailableCopies = b.AvailableCopies
+                })
+                .ToList();
+        }
     }
 }

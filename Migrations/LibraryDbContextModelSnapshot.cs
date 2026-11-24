@@ -49,6 +49,32 @@ namespace LibraryManagement.Api.Migrations
                     b.ToTable("Books");
                 });
 
+            modelBuilder.Entity("LibraryManagement.Api.Models.Loan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("BorrowedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DueOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MemberId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ReturnedOn")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Loans");
+                });
+
             modelBuilder.Entity("LibraryManagement.Api.Models.Member", b =>
                 {
                     b.Property<int>("Id")
