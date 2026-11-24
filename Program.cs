@@ -10,7 +10,7 @@ builder.Services.AddDbContext<LibraryDbContext>(
     builder.Configuration.GetConnectionString("LibraryDb")
     ));
 builder.Services.AddScoped<IBookService, BookService>();//ek HTTP request ke scope mein service ka instance manage hota hai. Agli request par alag scope hota hai.
-builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IMemberService, MemberService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
