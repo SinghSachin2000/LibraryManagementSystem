@@ -1,8 +1,9 @@
 ﻿using LibraryManagement.Api.Data;
+using LibraryManagement.Api.DTOs;
 using LibraryManagement.Api.Models;
+using LibraryManagement.Api.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using LibraryManagement.Api.DTOs;
 
 namespace LibraryManagement.Api.Controllers
 {
@@ -10,144 +11,171 @@ namespace LibraryManagement.Api.Controllers
     [ApiController]
     public class MembersController : ControllerBase
     {
-        private readonly LibraryDbContext _context;
-        public MembersController(LibraryDbContext context)
+        //private readonly LibraryDbContext _context;
+        //public MembersController(LibraryDbContext context)
+        //{
+        //    _context = context;
+        //}
+        private readonly IMemberService _memberService;
+        public MembersController(IMemberService memberService)
         {
-            _context = context;
+            _memberService = memberService;
         }
-
         [HttpGet]
         public IActionResult GetAllMembers()
         {
             //var members = _context.Members.ToList();
-            var members = _context.Members.Select(m=>new MemberDto
-            {
-                Id = m.Id,
-                FullName = m.FullName,
-                Email = m.Email,
-                JoinedOn = m.JoinedOn,
-                IsActive = m.IsActive
-            }).ToList();
+            var members = _memberService.GetAllMembers();
             return Ok(members);
         }
 
         [HttpGet("{id:int}")]
         public IActionResult GetMemberById(int id)
         {
-            var member = _context.Members.Where(m=>m.Id==id).Select(m=>new MemberDto
-            {
-                Id = m.Id,
-                FullName = m.FullName,
-                Email = m.Email,
-                JoinedOn = m.JoinedOn,
-                IsActive = m.IsActive
-            }).FirstOrDefault();
+          var member = _memberService.GetMemberById(id);
+
             if (member == null)
             {
-                return NotFound(new { message = "member is not found" });
+                return NotFound(new { message = "Member not found" });
             }
+
             return Ok(member);
         }
 
         [HttpPost]
         public IActionResult AddMember([FromBody] CreateMemberDto member)
         {
-            if (string.IsNullOrWhiteSpace(member.FullName))
-            {
-                return BadRequest(new { message = "fullname is required" });
-            }
-            if (string.IsNullOrWhiteSpace(member.Email))
-            {
-                return BadRequest(new { message = "email is required" });
-            }
-            var isEmailExists = _context.Members.Any(m => m.Email.ToLower() == member.Email.ToLower());
-            if (isEmailExists)
-            {
-                return BadRequest(new { message = "A member with this email is already exists" });
-            }
+            //if (string.IsNullOrWhiteSpace(member.FullName))
+            //{
+            //    return BadRequest(new { message = "fullname is required" });
+            //}
+            //if (string.IsNullOrWhiteSpace(member.Email))
+            //{
+            //    return BadRequest(new { message = "email is required" });
+            //}
+            //var isEmailExists = _context.Members.Any(m => m.Email.ToLower() == member.Email.ToLower());
+            //if (isEmailExists)
+            //{
+            //    return BadRequest(new { message = "A member with this email is already exists" });
+            //}
             //member.Id = 0;
             //member.JoinedOn = DateTime.Now;
             //member.IsActive = true;
 
-            var newMember =new Member
+            //var newMember =new Member
+            //{
+            //    FullName = member.FullName,
+            //    Email = member.Email,
+            //    JoinedOn = DateTime.Now,
+            //    IsActive = true
+            //};
+
+            //_context.Members.Add(newMember);
+            //_context.SaveChanges();
+
+            //return CreatedAtAction(nameof(GetMemberById),
+            //    new { id = newMember.Id },
+            //    new MemberDto
+            //    {
+            //        Id = newMember.Id,
+            //        FullName = newMember.FullName,
+            //        Email = newMember.Email,
+            //        JoinedOn = newMember.JoinedOn,
+            //        IsActive = newMember.IsActive
+            //    });
+
+            var error = _memberService.ValidateCreateMember(member);
+
+            if (error != null)
             {
-                FullName = member.FullName,
-                Email = member.Email,
-                JoinedOn = DateTime.Now,
-                IsActive = true
-            };
+                return BadRequest(new { message = error });
+            }
 
-            _context.Members.Add(newMember);
-            _context.SaveChanges();
+            var newmMember = _memberService.CreateMember(member);
 
-            return CreatedAtAction(nameof(GetMemberById),
-                new { id = newMember.Id },
-                new MemberDto
-                {
-                    Id = newMember.Id,
-                    FullName = newMember.FullName,
-                    Email = newMember.Email,
-                    JoinedOn = newMember.JoinedOn,
-                    IsActive = newMember.IsActive
-                });
+            return CreatedAtAction(
+                nameof(GetMemberById),
+                new { id = newmMember.Id },
+                newmMember
+            );
 
         }
 
         [HttpPut("{id:int}")]
         public IActionResult updateMember(int id, [FromBody] UpdateMemberDto member)
         {
-            var existingMember = _context.Members.FirstOrDefault(m => m.Id == id);
-            if (existingMember==null)
+            //var existingMember = _context.Members.FirstOrDefault(m => m.Id == id);
+            //if (existingMember==null)
+            //{
+            //    return NotFound(new
+            //    {
+            //        message = "this member is not found"
+            //    });
+            //}
+            //if (string.IsNullOrWhiteSpace(member.FullName))
+            //    return BadRequest(new { message = "FullName is required." });
+
+            //if (string.IsNullOrWhiteSpace(member.Email))
+            //    return BadRequest(new { message = "Email is required." });
+
+            //bool emailExists = _context.Members.Any(m =>
+            //    m.Id != id &&
+            //    m.Email.ToLower() == member.Email.ToLower());
+
+            //if (emailExists)
+            //    return BadRequest(new { message = "Email already exists." });
+
+            //existingMember.FullName = member.FullName;
+            //existingMember.Email = member.Email;
+            //existingMember.IsActive = member.IsActive;
+
+            //_context.SaveChanges();
+
+            //return Ok(new MemberDto
+            //{
+            //    Id = existingMember.Id,
+            //    FullName = existingMember.FullName,
+            //    Email = existingMember.Email,
+            //    JoinedOn = existingMember.JoinedOn,
+            //    IsActive = existingMember.IsActive
+            //});
+            var error = _memberService.ValidateUpdateMember(id, member);
+
+            if (error != null)
             {
-                return NotFound(new
+                if (error == "Member not found")
                 {
-                    message = "this member is not found"
-                });
+                    return NotFound(new { message = error });
+                }
+
+                return BadRequest(new { message = error });
             }
-            if (string.IsNullOrWhiteSpace(member.FullName))
-                return BadRequest(new { message = "FullName is required." });
 
-            if (string.IsNullOrWhiteSpace(member.Email))
-                return BadRequest(new { message = "Email is required." });
+            var updatedMember = _memberService.UpdateMember(id, member);
 
-            bool emailExists = _context.Members.Any(m =>
-                m.Id != id &&
-                m.Email.ToLower() == member.Email.ToLower());
-
-            if (emailExists)
-                return BadRequest(new { message = "Email already exists." });
-
-            existingMember.FullName = member.FullName;
-            existingMember.Email = member.Email;
-            existingMember.IsActive = member.IsActive;
-
-            _context.SaveChanges();
-
-            return Ok(new MemberDto
-            {
-                Id = existingMember.Id,
-                FullName = existingMember.FullName,
-                Email = existingMember.Email,
-                JoinedOn = existingMember.JoinedOn,
-                IsActive = existingMember.IsActive
-            });
+            return Ok(updatedMember);
         }
 
         [HttpDelete("{id:int}")]
         public IActionResult DeleteMember(int id)
         {
-            var member = _context.Members.FirstOrDefault(m => m.Id == id);
+            //var member = _context.Members.FirstOrDefault(m => m.Id == id);
 
-            if (member == null)
-            {
-                return NotFound(new
-                {
-                    message = $"Member with ID {id} was not found."
-                });
-            }
+            //if (member == null)
+            //{
+            //    return NotFound(new
+            //    {
+            //        message = $"Member with ID {id} was not found."
+            //    });
+            //}
 
-            _context.Members.Remove(member);
-            _context.SaveChanges();
+            //_context.Members.Remove(member);
+            //_context.SaveChanges();
+            bool isDeleted = _memberService.DeleteMember(id);
+
+            if (!isDeleted)
+                return NotFound(new { message = "Member not found" });
+
 
             return NoContent();
         }
